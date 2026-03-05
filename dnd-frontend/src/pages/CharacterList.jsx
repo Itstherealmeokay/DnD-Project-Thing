@@ -66,12 +66,20 @@ const CharacterList = () => {
                   <div>WIS: {char.wisdom}</div>
                   <div>CHA: {char.charisma}</div>
                 </div>
-                <button
-                  onClick={() => deleteCharacter(char._id)}
-                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                >
-                  Delete Character
-                </button>
+                <div className="mt-4 flex gap-2">
+                  <Link
+                    to={`/characters/${char._id}`}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 text-center"
+                  >
+                    View Details
+                  </Link>
+                  <button
+                    onClick={() => deleteCharacter(char._id)}
+                    className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

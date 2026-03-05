@@ -113,4 +113,15 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+//View Character Details
+router.get('/:id', async (req, res) => {
+    try {
+        const character = await Character.findById(req.params.id);
+        if (!character) return res.status(404).json({ message: 'Character not found' });
+        res.json(character);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 export default router;
