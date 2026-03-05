@@ -21,6 +21,16 @@ const CharacterList = () => {
     }
   };
 
+  const deleteCharacter = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this character?')) return;
+    try {
+      await axios.delete(`/api/characters/${id}`);
+      fetchCharacters();
+    } catch (error) {
+      console.error('Error deleting character:', error);
+    }
+  };
+
   if (loading) return <div className="text-center py-8">Loading...</div>;
 
   return (
@@ -56,6 +66,12 @@ const CharacterList = () => {
                   <div>WIS: {char.wisdom}</div>
                   <div>CHA: {char.charisma}</div>
                 </div>
+                <button
+                  onClick={() => deleteCharacter(char._id)}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                >
+                  Delete Character
+                </button>
               </div>
             ))}
           </div>
