@@ -85,7 +85,7 @@ const CreateCharacter = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Your existing form fields */}
+          {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -102,7 +102,21 @@ const CreateCharacter = () => {
               />
             </div>
             
-            {/* ... rest of your form fields ... */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Race *
+              </label>
+              <input
+                type="text"
+                name="race"
+                value={newCharacter.race}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="e.g., Human, Elf, Dwarf"
+              />
+            </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Class *
@@ -118,7 +132,49 @@ const CreateCharacter = () => {
               />
             </div>
             
-            {/* Add all your other form fields here */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Level *
+              </label>
+              <input
+                type="number"
+                name="level"
+                value={newCharacter.level}
+                onChange={handleChange}
+                min="1"
+                max="20"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Background
+              </label>
+              <input
+                type="text"
+                name="background"
+                value={newCharacter.background}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="e.g., Soldier, Noble"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Alignment
+              </label>
+              <input
+                type="text"
+                name="alignment"
+                value={newCharacter.alignment}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="e.g., Lawful Good, Chaotic Neutral"
+              />
+            </div>
           </div>
 
           {/* Ability Scores */}
