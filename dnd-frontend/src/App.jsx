@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import axios from 'axios'
 
 function App() {
   const [newCharacter, setNewCharacter] = useState({
@@ -32,17 +33,9 @@ function App() {
     setMessage({ text: '', type: '' })
 
     try {
-      const response = await fetch('http://localhost:5000/api/characters', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newCharacter),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
+      const response = await axios.post('/api/characters', newCharacter)
+      
+      if (response.status === 201) {
         setMessage({ text: 'Character created successfully!', type: 'success' })
         // Reset form
         setNewCharacter({
@@ -61,7 +54,7 @@ function App() {
           proficiencyBonus: 2
         })
       } else {
-        setMessage({ text: data.message || 'Failed to create character', type: 'error' })
+        setMessage({ text: response.data.message || 'Failed to create character', type: 'error' })
       }
     } catch (error) {
       setMessage({ text: 'Error connecting to server. Make sure the backend is running.', type: 'error' })
