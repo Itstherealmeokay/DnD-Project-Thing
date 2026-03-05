@@ -28,6 +28,30 @@ const CharacterDetails = () => {
     fetchCharacter();
   }, [id]);
 
+  const handleScoreChange = async (abilityName, newScore) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          [abilityName]: newScore,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      console.error('Error updating character:', err);
+      alert('Failed to update ability score');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -63,7 +87,7 @@ const CharacterDetails = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto">
         {/* Character Info Box */}
         <div className="bg-white border-2 border-gray-700 rounded-lg p-6 shadow-lg mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
@@ -78,16 +102,17 @@ const CharacterDetails = () => {
         </div>
 
         {/* Ability Scores Section */}
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        <div className="bg-gray-50 rounded-lg p-6 inline-block">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Ability Scores
           </h2>
-          <div className="flex flex-col gap-4 max-w-xs mx-auto">
+          <div className="flex flex-row gap-4 flex-wrap">
             {abilityScores.map((ability) => (
               <AbilityScoreBox
                 key={ability.name}
                 abilityName={ability.name}
                 score={ability.score}
+                onScoreChange={handleScoreChange}
               />
             ))}
           </div>

@@ -93,10 +93,10 @@ router.patch('/:id', async (req, res) => {
         }
         if (req.body.spells !=undefined) {
             character.spells = req.body.spells;
-        }
+        }*/
 
         const updatedCharacter = await character.save();
-        res.json(updatedCharacter); */
+        res.json(updatedCharacter);
 
     } catch (error) {
         res.status(400).json({ message: error.message });
