@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import SubmitButton from '../components/SubmitButton';
 
 const CreateCharacter = () => {
   const navigate = useNavigate();
@@ -241,12 +242,9 @@ const CreateCharacter = () => {
 
           {/* Submit Button */}
           <div className="pt-6 flex justify-end">
-            <button
-              type="submit"
-              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200"
-            >
+            <SubmitButton type="submit">
               Create Character
-            </button>
+            </SubmitButton>
           </div>
         </form>
       </div>

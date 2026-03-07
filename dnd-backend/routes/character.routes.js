@@ -95,7 +95,6 @@ router.patch('/:id', async (req, res) => {
         if (req.body.spells !=undefined) {
             character.spells = req.body.spells;
         }*/
-        }*/
 
         const updatedCharacter = await character.save();
         await updatedCharacter.populate('class');

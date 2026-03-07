@@ -19,6 +19,9 @@ const Navbar = () => {
             <Link to="/characters" className="text-gray-700 hover:text-purple-500 px-3 py-2 rounded-md">
               View Characters
             </Link>
+            <Link to="/classes" className="text-gray-700 hover:text-purple-500 px-3 py-2 rounded-md">
+              View Classes
+            </Link>
           </div>
         </div>
       </div>
