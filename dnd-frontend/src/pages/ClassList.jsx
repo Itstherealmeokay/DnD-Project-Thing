@@ -65,7 +65,7 @@ const ClassList = () => {
                         {classes.map((classData) => (
                             <div key={classData._id} className="bg-white rounded-lg shadow-lg p-6">
                                 <h2 className="text-2xl font-bold mb-2">{classData.name}</h2>
-                                <p className="text-gray-700 mb-4">Hit Die: {classData.hitDie}</p>
+                                <p className="text-gray-700 mb-4">Hit Die: 1d{classData.hitDie ?? classData.hitdie}</p>
 
                                 <div className="space-y-3 text-sm">
                                     <div>

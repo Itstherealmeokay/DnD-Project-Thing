@@ -16,6 +16,8 @@ const characterSchema = new mongoose.Schema({
     charisma: {type: Number, required: true, min: 1, max: 30}, 
 
     proficiencyBonus: {type: Number, required: true}, 
+    currentHitPoints: {type: Number, required: true},
+    maxHitPoints: {type: Number, required: true},
     //equipment: [equipmentSchema], 
     //spells: [spellSchema], 
 });

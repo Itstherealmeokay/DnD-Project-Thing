@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InfoBox from '../components/InfoBox';
 import AbilityScoreBox from '../components/AbilityScoreBox';
+import VitalsBox from '../components/VitalsBox';
 
 const CharacterDetails = () => {
   const { id } = useParams();
@@ -52,6 +53,32 @@ const CharacterDetails = () => {
     }
   };
 
+  const handleVitalChange = async (fieldName, newValue) => {
+    if (!Number.isFinite(newValue)) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          [fieldName]: newValue,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      console.error('Error updating vitals:', err);
+      alert('Failed to update vitals');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -90,6 +117,23 @@ const CharacterDetails = () => {
       ? character.class.name
       : character.class;
 
+  const classHitDie =
+    typeof character.class === 'object' && character.class !== null
+      ? Number(character.class.hitDie ?? character.class.hitdie ?? 0)
+      : 0;
+  const level = Number(character.level ?? 0);
+
+  const constitutionModifier = Math.floor((Number(character.constitution ?? 10) - 10) / 2);
+  const dexterityModifier = Math.floor((Number(character.dexterity ?? 10) - 10) / 2);
+
+  const hitDieBonus = Math.floor(((classHitDie / 2) + 1) * (level - 1));
+  const calculatedHitPoints = classHitDie + hitDieBonus + (constitutionModifier * level);
+  const maxHitPoints = Number(character.maxHitPoints ?? calculatedHitPoints);
+  const currentHitPoints = Number(character.currentHitPoints ?? maxHitPoints);
+  const armorClass = 10 + dexterityModifier;
+  const hitDieAmt = `${level}`;
+  const hitDiceDisplay = classHitDie > 0 ? `${hitDieAmt}d${classHitDie}` : `${level}/-`;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto">
@@ -106,20 +150,43 @@ const CharacterDetails = () => {
           </div>
         </div>
 
-        {/* Ability Scores Section */}
-        <div className="bg-gray-50 rounded-lg p-6 inline-block">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Ability Scores
-          </h2>
-          <div className="flex flex-row gap-4 flex-wrap">
-            {abilityScores.map((ability) => (
-              <AbilityScoreBox
-                key={ability.name}
-                abilityName={ability.name}
-                score={ability.score}
-                onScoreChange={handleScoreChange}
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Ability Scores Section */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Ability Scores
+            </h2>
+            <div className="flex flex-row gap-4 flex-wrap">
+              {abilityScores.map((ability) => (
+                <AbilityScoreBox
+                  key={ability.name}
+                  abilityName={ability.name}
+                  score={ability.score}
+                  onScoreChange={handleScoreChange}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Vitals Section */}
+          <div className="bg-gray-50 rounded-lg p-6 min-w-64 w-full">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Vitals</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <VitalsBox name="Armor Class" value={armorClass} readOnly />
+              <VitalsBox
+                name="Max Hit Points"
+                value={maxHitPoints}
+                onValueChange={(newValue) => handleVitalChange('maxHitPoints', newValue)}
               />
-            ))}
+              <VitalsBox
+                name="Current Hit Points"
+                value={currentHitPoints}
+                onValueChange={(newValue) => handleVitalChange('currentHitPoints', newValue)}
+              />
+              <div className="sm:col-span-2 lg:col-span-3">
+                <VitalsBox name="Hit Die" value={hitDiceDisplay} readOnly />
+              </div>
+            </div>
           </div>
         </div>
       </div>
