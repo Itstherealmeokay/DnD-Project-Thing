@@ -85,6 +85,11 @@ const CharacterDetails = () => {
     { name: 'Charisma', score: character.charisma },
   ];
 
+  const classDisplayName =
+    typeof character.class === 'object' && character.class !== null
+      ? character.class.name
+      : character.class;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto">
@@ -94,7 +99,7 @@ const CharacterDetails = () => {
             {character.name}
           </h1>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <InfoBox title="Class" value={character.class} />
+            <InfoBox title="Class" value={classDisplayName} />
             <InfoBox title="Level" value={character.level} />
             <InfoBox title="Race" value={character.race} />
             <InfoBox title="Background" value={character.background} />

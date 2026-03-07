@@ -55,7 +55,7 @@ const CharacterList = () => {
             {characters.map((char) => (
               <div key={char._id} className="bg-white rounded-lg shadow-lg p-6">
                 <h2 className="text-xl font-bold mb-2">{char.name}</h2>
-                <p className="text-gray-600">Level {char.level} {char.race} {char.class}</p>
+                <p className="text-gray-600">Level {char.level} {char.race} {char.class?.name || 'Unknown Class'}</p>
                 <p className="text-gray-600">Background: {char.background}</p>
                 <p className="text-gray-600">Alignment: {char.alignment}</p>
                 <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
