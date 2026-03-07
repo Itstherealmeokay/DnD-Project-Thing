@@ -19,7 +19,7 @@ const CreateCharacter = () => {
     intelligence: 10,
     wisdom: 10,
     charisma: 10,
-    proficiencyBonus: 2
+    proficiencyBonus: 2,
   });
 
   const [message, setMessage] = useState({ text: '', type: '' });
@@ -72,7 +72,7 @@ const CreateCharacter = () => {
           intelligence: 10,
           wisdom: 10,
           charisma: 10,
-          proficiencyBonus: 2
+          proficiencyBonus: 2,
         });
       }
     } catch (error) {

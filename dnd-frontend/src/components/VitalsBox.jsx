@@ -1,30 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const VitalsBox = ({ name, value, onValueChange, readOnly = false }) => {
   const [localValue, setLocalValue] = useState(value);
 
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
   const handleChange = (e) => {
     if (readOnly) return;
 
-    const newValue = parseInt(e.target.value);
+    const newValue = parseInt(e.target.value, 10);
+    if (Number.isNaN(newValue)) {
+      setLocalValue('');
+      return;
+    }
+
     setLocalValue(newValue);
-    onValueChange?.(name, newValue);
+    onValueChange?.(newValue);
   };
-
-  const calculateHitDiebonus = ({ hitDie, level }) => {
-    if (!hitDie || !level) return 0;
-    return Math.floor((hitDie / 2) * level);
-  }
-
-  const calculateHitPoints = ({ hitDie, level, constitutionModifier }) => {
-    if (!hitDie || !level || !constitutionModifier) return 0;
-    const hitDieBonus = calculateHitDiebonus({ hitDie, level });
-    return hitDieBonus + (constitutionModifier * level);
-  }
-
-  const calulateBaseArmorClass = (dexterityModifier) => {
-    return 10 + dexterityModifier;
-  }
 
   return (
     <div className="flex flex-col">

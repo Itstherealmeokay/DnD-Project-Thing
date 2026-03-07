@@ -1,7 +1,29 @@
 import express from 'express';
 import Character from '../models/character.models.js';
+import Class from '../models/class.models.js';
 
 const router = express.Router();
+
+const calculateDefaultHitPoints = async ({ classId, level, constitution }) => {
+    let defaultHitPoints = 1;
+
+    if (!classId) {
+        return defaultHitPoints;
+    }
+
+    const selectedClass = await Class.findById(classId);
+    if (!selectedClass) {
+        return defaultHitPoints;
+    }
+
+    const classHitDie = Number(selectedClass.hitDie ?? selectedClass.hitdie ?? 0);
+    const safeLevel = Number(level ?? 1);
+    const constitutionModifier = Math.floor((Number(constitution ?? 10) - 10) / 2);
+    const hitDieBonus = Math.floor(((classHitDie / 2) + 1) * (safeLevel - 1));
+
+    defaultHitPoints = classHitDie + hitDieBonus + (constitutionModifier * safeLevel);
+    return defaultHitPoints;
+};
 
 //Get all characters
 router.get('/', async (req, res) => {
@@ -15,25 +37,33 @@ router.get('/', async (req, res) => {
 
 // Add a new character
 router.post('/', async (req, res) => {
-    const character = new Character({
-        name: req.body.name,
-        class: req.body.class,
-        level: req.body.level,
-        background: req.body.background,
-        race: req.body.race,
-        alignment: req.body.alignment,
-        strength: req.body.strength,
-        dexterity: req.body.dexterity,
-        constitution: req.body.constitution,
-        intelligence: req.body.intelligence,
-        wisdom: req.body.wisdom,
-        charisma: req.body.charisma,
-        proficiencyBonus: req.body.proficiencyBonus,
-        /*equipment: req.body.equipment,
-        spells: req.body.spells,*/
-    });
-
     try {
+        const defaultHitPoints = await calculateDefaultHitPoints({
+            classId: req.body.class,
+            level: req.body.level,
+            constitution: req.body.constitution,
+        });
+
+        const character = new Character({
+            name: req.body.name,
+            class: req.body.class,
+            level: req.body.level,
+            background: req.body.background,
+            race: req.body.race,
+            alignment: req.body.alignment,
+            strength: req.body.strength,
+            dexterity: req.body.dexterity,
+            constitution: req.body.constitution,
+            intelligence: req.body.intelligence,
+            wisdom: req.body.wisdom,
+            charisma: req.body.charisma,
+            proficiencyBonus: req.body.proficiencyBonus,
+            maxHitPoints: req.body.maxHitPoints ?? defaultHitPoints,
+            currentHitPoints: req.body.currentHitPoints ?? req.body.maxHitPoints ?? defaultHitPoints,
+            /*equipment: req.body.equipment,
+            spells: req.body.spells,*/
+        });
+
         const newCharacter = await character.save();
         await newCharacter.populate('class');
         res.status(201).json(newCharacter);
@@ -49,6 +79,21 @@ router.patch('/:id', async (req, res) => {
     try {
         const character = await Character.findById(req.params.id);
         if (!character) return res.status(404).json({ message: 'Character not found' });
+
+        if (character.maxHitPoints == undefined || character.currentHitPoints == undefined) {
+            const defaultHitPoints = await calculateDefaultHitPoints({
+                classId: character.class,
+                level: character.level,
+                constitution: character.constitution,
+            });
+
+            if (character.maxHitPoints == undefined) {
+                character.maxHitPoints = defaultHitPoints;
+            }
+            if (character.currentHitPoints == undefined) {
+                character.currentHitPoints = character.maxHitPoints;
+            }
+        }
         
         if (req.body.name !=undefined) {
             character.name = req.body.name;
@@ -88,6 +133,12 @@ router.patch('/:id', async (req, res) => {
         }
         if (req.body.proficiencyBonus !=undefined) {
             character.proficiencyBonus = req.body.proficiencyBonus;
+        }
+        if (req.body.maxHitPoints !=undefined) {
+            character.maxHitPoints = req.body.maxHitPoints;
+        }
+        if (req.body.currentHitPoints !=undefined) {
+            character.currentHitPoints = req.body.currentHitPoints;
         }
         /*if (req.body.equipment !=undefined) {
             character.equipment = req.body.equipment;
