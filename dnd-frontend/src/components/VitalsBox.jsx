@@ -3,8 +3,6 @@ import { useState } from 'react';
 const VitalsBox = ({ name, value, onValueChange, readOnly = false }) => {
   const [localValue, setLocalValue] = useState(value);
 
-
-
   const handleChange = (e) => {
     if (readOnly) return;
 

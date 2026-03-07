@@ -100,10 +100,11 @@ const CharacterDetails = () => {
   const constitutionModifier = Math.floor((Number(character.constitution ?? 10) - 10) / 2);
   const dexterityModifier = Math.floor((Number(character.dexterity ?? 10) - 10) / 2);
 
-  const hitDieBonus = Math.floor((classHitDie / 2) * level);
-  const hitPoints = hitDieBonus + (constitutionModifier * level);
+  const hitDieBonus = Math.floor(((classHitDie / 2)+1) * (level - 1));
+  const hitPoints = classHitDie + hitDieBonus + (constitutionModifier * level);
   const armorClass = 10 + dexterityModifier;
-  const hitDiceDisplay = classHitDie > 0 ? `${level}d${classHitDie}` : `${level}/-`;
+  const hitDieAmt = `${level}`;
+  const hitDiceDisplay = classHitDie > 0 ? `${hitDieAmt}d${classHitDie}` : `${level}/-`;
 
   return (
     <div className="container mx-auto px-4 py-8">
