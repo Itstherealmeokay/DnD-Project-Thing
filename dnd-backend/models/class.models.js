@@ -6,7 +6,7 @@ const classSchema = new mongoose.Schema({
     required: true,
   },
   hitDie: {
-    type: String,
+    type: Number,
     required: true,
   },
   armorProficiencies: {

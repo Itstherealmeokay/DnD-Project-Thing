@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InfoBox from '../components/InfoBox';
 import AbilityScoreBox from '../components/AbilityScoreBox';
+import VitalsBox from '../components/VitalsBox';
 
 const CharacterDetails = () => {
   const { id } = useParams();
@@ -90,6 +91,20 @@ const CharacterDetails = () => {
       ? character.class.name
       : character.class;
 
+  const classHitDie =
+    typeof character.class === 'object' && character.class !== null
+      ? Number(character.class.hitDie ?? character.class.hitdie ?? 0)
+      : 0;
+  const level = Number(character.level ?? 0);
+
+  const constitutionModifier = Math.floor((Number(character.constitution ?? 10) - 10) / 2);
+  const dexterityModifier = Math.floor((Number(character.dexterity ?? 10) - 10) / 2);
+
+  const hitDieBonus = Math.floor((classHitDie / 2) * level);
+  const hitPoints = hitDieBonus + (constitutionModifier * level);
+  const armorClass = 10 + dexterityModifier;
+  const hitDiceDisplay = classHitDie > 0 ? `${level}d${classHitDie}` : `${level}/-`;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto">
@@ -106,20 +121,35 @@ const CharacterDetails = () => {
           </div>
         </div>
 
-        {/* Ability Scores Section */}
-        <div className="bg-gray-50 rounded-lg p-6 inline-block">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Ability Scores
-          </h2>
-          <div className="flex flex-row gap-4 flex-wrap">
-            {abilityScores.map((ability) => (
-              <AbilityScoreBox
-                key={ability.name}
-                abilityName={ability.name}
-                score={ability.score}
-                onScoreChange={handleScoreChange}
-              />
-            ))}
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Ability Scores Section */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Ability Scores
+            </h2>
+            <div className="flex flex-row gap-4 flex-wrap">
+              {abilityScores.map((ability) => (
+                <AbilityScoreBox
+                  key={ability.name}
+                  abilityName={ability.name}
+                  score={ability.score}
+                  onScoreChange={handleScoreChange}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Vitals Section */}
+          <div className="bg-gray-50 rounded-lg p-6 min-w-64 w-full">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Vitals</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <VitalsBox name="Armor Class" value={armorClass} onValueChange={() => {}} />
+              <VitalsBox name="Max Hit Points" value={hitPoints} readOnly />
+              <VitalsBox name="Current Hit Points" value={hitPoints} onValueChange={() => {}} />
+              <div className="sm:col-span-2 lg:col-span-3">
+                <VitalsBox name="Hit Die" value={hitDiceDisplay} readOnly />
+              </div>
+            </div>
           </div>
         </div>
       </div>
