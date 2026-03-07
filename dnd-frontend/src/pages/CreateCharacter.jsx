@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateCharacter = () => {
   const navigate = useNavigate();
+  const [availableClasses, setAvailableClasses] = useState([]);
   const [newCharacter, setNewCharacter] = useState({
     name: '',
     class: '',
@@ -21,6 +22,20 @@ const CreateCharacter = () => {
   });
 
   const [message, setMessage] = useState({ text: '', type: '' });
+
+  // Fetch available classes on component mount
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await axios.get('/api/classes');
+        setAvailableClasses(response.data);
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+        setMessage({ text: 'Error loading classes', type: 'error' });
+      }
+    };
+    fetchClasses();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,15 +136,20 @@ const CreateCharacter = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Class *
               </label>
-              <input
-                type="text"
+              <select
                 name="class"
                 value={newCharacter.class}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="e.g., Wizard, Fighter"
-              />
+              >
+                <option value="">Select a class</option>
+                {availableClasses.map((classOption) => (
+                  <option key={classOption._id} value={classOption._id}>
+                    {classOption.name}
+                  </option>
+                ))}
+              </select>
             </div>
             
             <div>

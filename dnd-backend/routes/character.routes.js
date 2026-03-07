@@ -6,7 +6,7 @@ const router = express.Router();
 //Get all characters
 router.get('/', async (req, res) => {
     try {
-        const characters = await Character.find();
+        const characters = await Character.find().populate('class');
         res.json(characters);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -35,6 +35,7 @@ router.post('/', async (req, res) => {
 
     try {
         const newCharacter = await character.save();
+        await newCharacter.populate('class');
         res.status(201).json(newCharacter);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -93,10 +94,11 @@ router.patch('/:id', async (req, res) => {
         }
         if (req.body.spells !=undefined) {
             character.spells = req.body.spells;
-        }
+        }*/
 
         const updatedCharacter = await character.save();
-        res.json(updatedCharacter); */
+        await updatedCharacter.populate('class');
+        res.json(updatedCharacter);
 
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -108,6 +110,17 @@ router.delete('/:id', async (req, res) => {
     try {
         await Character.findByIdAndDelete(req.params.id);
         res.json({ message: 'Character deleted' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+//View Character Details
+router.get('/:id', async (req, res) => {
+    try {
+        const character = await Character.findById(req.params.id).populate('class');
+        if (!character) return res.status(404).json({ message: 'Character not found' });
+        res.json(character);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -4,6 +4,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import characterRoutes from './routes/character.routes.js';
+import classRoutes from './routes/class.routes.js';
 import { connectDB } from './config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/characters", characterRoutes);
+app.use("/api/classes", classRoutes);
 
 app.listen(5000, () => {
     connectDB();
