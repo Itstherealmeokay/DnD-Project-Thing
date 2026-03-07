@@ -34,9 +34,15 @@ const CreateClass = () => {
     e.preventDefault();
     setMessage({ text: '', type: '' });
 
+    const parsedHitDie = Number(formData.hitDie);
+    if (!Number.isInteger(parsedHitDie) || parsedHitDie <= 0) {
+      setMessage({ text: 'Hit Die must be a positive whole number.', type: 'error' });
+      return;
+    }
+
     const payload = {
       name: formData.name,
-      hitDie: formData.hitDie,
+      hitDie: parsedHitDie,
       armorProficiencies: toArray(formData.armorProficiencies),
       weaponProficiencies: toArray(formData.weaponProficiencies),
       savingThrows: toArray(formData.savingThrows),
@@ -85,12 +91,15 @@ const CreateClass = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Hit Die *</label>
               <input
+                type="number"
                 name="hitDie"
                 value={formData.hitDie}
                 onChange={handleChange}
                 required
+                min="1"
+                step="1"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="e.g., 1d10"
+                placeholder="e.g., 10"
               />
             </div>
           </div>
