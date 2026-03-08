@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Class from './class.models.js';
 
 const characterSchema = new mongoose.Schema({
     name: {type: String, required: true}, 
@@ -18,6 +19,10 @@ const characterSchema = new mongoose.Schema({
     proficiencyBonus: {type: Number, required: true}, 
     currentHitPoints: {type: Number, required: true},
     maxHitPoints: {type: Number, required: true},
+    hitDie: {type: Number, required: false, default: 8},
+    hitDieAmount: {type: Number, required: false, default: 1},
+    safeHitDieAmount: {type: Number, required: false, default: 1},
+    overrideHitPoints: {type: Boolean, required: false, default: false},
     //equipment: [equipmentSchema], 
     //spells: [spellSchema], 
 });

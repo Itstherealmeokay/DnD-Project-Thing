@@ -44,6 +44,15 @@ router.post('/', async (req, res) => {
             constitution: req.body.constitution,
         });
 
+        // Get class hit die
+        let classHitDie = 8; // Default value
+        if (req.body.class) {
+            const selectedClass = await Class.findById(req.body.class);
+            if (selectedClass) {
+                classHitDie = Number(selectedClass.hitDie ?? selectedClass.hitdie ?? 8);
+            }
+        }
+
         const character = new Character({
             name: req.body.name,
             class: req.body.class,
@@ -60,6 +69,10 @@ router.post('/', async (req, res) => {
             proficiencyBonus: req.body.proficiencyBonus,
             maxHitPoints: req.body.maxHitPoints ?? defaultHitPoints,
             currentHitPoints: req.body.currentHitPoints ?? req.body.maxHitPoints ?? defaultHitPoints,
+            hitDie: req.body.hitDie ?? classHitDie,
+            hitDieAmount: req.body.hitDieAmount ?? req.body.level ?? 1,
+            safeHitDieAmount: req.body.safeHitDieAmount ?? req.body.level ?? 1,
+            overrideHitPoints: req.body.overrideHitPoints ?? false,
             /*equipment: req.body.equipment,
             spells: req.body.spells,*/
         });
@@ -92,6 +105,24 @@ router.patch('/:id', async (req, res) => {
             }
             if (character.currentHitPoints == undefined) {
                 character.currentHitPoints = character.maxHitPoints;
+            }
+        }
+
+        // Initialize hitDie and hitDieAmount if missing (for existing characters)
+        if (character.hitDie == undefined || character.hitDieAmount == undefined || character.safeHitDieAmount == undefined) {
+            if (character.hitDie == undefined && character.class) {
+                const selectedClass = await Class.findById(character.class);
+                if (selectedClass) {
+                    character.hitDie = Number(selectedClass.hitDie ?? selectedClass.hitdie ?? 8);
+                } else {
+                    character.hitDie = 8;
+                }
+            }
+            if (character.hitDieAmount == undefined) {
+                character.hitDieAmount = character.level ?? 1;
+            }
+            if (character.safeHitDieAmount == undefined) {
+                character.safeHitDieAmount = character.level ?? 1;
             }
         }
         
@@ -139,6 +170,19 @@ router.patch('/:id', async (req, res) => {
         }
         if (req.body.currentHitPoints !=undefined) {
             character.currentHitPoints = req.body.currentHitPoints;
+        }
+        if (req.body.hitDie !=undefined) {
+            character.hitDie = req.body.hitDie;
+        }
+        if (req.body.hitDieAmount !=undefined) {
+            character.hitDieAmount = req.body.hitDieAmount;
+        }
+        if (req.body.overrideHitPoints !=undefined) {
+            character.overrideHitPoints = req.body.overrideHitPoints;
+        }
+
+        if (req.body.safeHitDieAmount != undefined) {
+            character.safeHitDieAmount = req.body.safeHitDieAmount;
         }
         /*if (req.body.equipment !=undefined) {
             character.equipment = req.body.equipment;
