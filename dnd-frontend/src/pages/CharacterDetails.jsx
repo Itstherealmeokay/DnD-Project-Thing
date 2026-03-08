@@ -181,6 +181,9 @@ const CharacterDetails = () => {
               <VitalsBox
                 name="Current Hit Points"
                 value={currentHitPoints}
+                color={
+                  currentHitPoints < maxHitPoints ? 'red' : currentHitPoints === maxHitPoints ? 'default' : currentHitPoints > maxHitPoints ? 'green' : 'default' 
+                }
                 onValueChange={(newValue) => handleVitalChange('currentHitPoints', newValue)}
               />
               <div className="sm:col-span-2 lg:col-span-3">
