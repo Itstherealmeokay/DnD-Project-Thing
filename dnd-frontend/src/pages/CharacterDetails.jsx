@@ -3,12 +3,15 @@ import { useParams } from 'react-router-dom';
 import InfoBox from '../components/InfoBox';
 import AbilityScoreBox from '../components/AbilityScoreBox';
 import VitalsBox from '../components/VitalsBox';
+import SkillSection from '../components/SkillSection';
 
 const CharacterDetails = () => {
   const { id } = useParams();
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [skillProficiencies, setSkillProficiencies] = useState([]);
+  const [skillExpertise, setSkillExpertise] = useState([]);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -123,6 +126,28 @@ const CharacterDetails = () => {
     }
   };
 
+  const handleToggleProficiency = (skillId) => {
+    setSkillProficiencies(prev => {
+      if (prev.includes(skillId)) {
+        // Remove proficiency and also remove expertise if it exists
+        setSkillExpertise(prevExpertise => prevExpertise.filter(id => id !== skillId));
+        return prev.filter(id => id !== skillId);
+      } else {
+        return [...prev, skillId];
+      }
+    });
+  };
+
+  const handleToggleExpertise = (skillId) => {
+    setSkillExpertise(prev => {
+      if (prev.includes(skillId)) {
+        return prev.filter(id => id !== skillId);
+      } else {
+        return [...prev, skillId];
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -156,6 +181,27 @@ const CharacterDetails = () => {
     { name: 'Charisma', score: character.charisma },
   ];
 
+  const Skills = [
+    { id: 'acrobatics', name: 'Acrobatics', ability: 'Dexterity' },
+    { id: 'animalHandling', name: 'Animal Handling', ability: 'Wisdom' },
+    { id: 'arcana', name: 'Arcana', ability: 'Intelligence' },
+    { id: 'athletics', name: 'Athletics', ability: 'Strength' },
+    { id: 'deception', name: 'Deception', ability: 'Charisma' },
+    { id: 'history', name: 'History', ability: 'Intelligence' },
+    { id: 'insight', name: 'Insight', ability: 'Wisdom' },
+    { id: 'intimidation', name: 'Intimidation', ability: 'Charisma' },
+    { id: 'investigation', name: 'Investigation', ability: 'Intelligence' },
+    { id: 'medicine', name: 'Medicine', ability: 'Wisdom' },
+    { id: 'nature', name: 'Nature', ability: 'Intelligence' },
+    { id: 'perception', name: 'Perception', ability: 'Wisdom' },
+    { id: 'performance', name: 'Performance', ability: 'Charisma' },
+    { id: 'persuasion', name: 'Persuasion', ability: 'Charisma' },
+    { id: 'religion', name: 'Religion', ability: 'Intelligence' },
+    { id: 'sleightOfHand', name: 'Sleight of Hand', ability: 'Dexterity' },
+    { id: 'stealth', name: 'Stealth', ability: 'Dexterity' },
+    { id: 'survival', name: 'Survival', ability: 'Wisdom' },
+  ];
+
   const classDisplayName =
     typeof character.class === 'object' && character.class !== null
       ? character.class.name
@@ -169,6 +215,10 @@ const CharacterDetails = () => {
 
   const constitutionModifier = Math.floor((Number(character.constitution ?? 10) - 10) / 2);
   const dexterityModifier = Math.floor((Number(character.dexterity ?? 10) - 10) / 2);
+  
+  // proficency given by user input
+  const proficiencyBonus = Number(character.proficiencyBonus ?? 0);
+  const expertiseBonus = proficiencyBonus * 2;  
 
   // Use class hit die for HP calculation
   const hitDieBonus = Math.floor(((classHitDie / 2) + 1) * (level - 1));
@@ -214,6 +264,28 @@ const CharacterDetails = () => {
                 />
               ))}
             </div>
+          </div>
+
+          {/* Skills Section */}
+          <div className="bg-gray-50 rounded-lg p-6 min-w-64 w-full">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Skills</h2>
+            {['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'].map((ability) => {
+              const abilityKey = ability.toLowerCase();
+              return (
+                <SkillSection
+                  key={ability}
+                  skills={Skills}
+                  ability={ability}
+                  proficiencyBonus={proficiencyBonus}
+                  expertiseBonus={expertiseBonus}
+                  skillProficiencies={skillProficiencies}
+                  skillExpertise={skillExpertise}
+                  onToggleProficiency={handleToggleProficiency}
+                  onToggleExpertise={handleToggleExpertise}
+                  abilityScore={character[abilityKey]}
+                />
+              );
+            })}
           </div>
 
           {/* Vitals Section */}

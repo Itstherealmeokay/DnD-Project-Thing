@@ -73,6 +73,7 @@ router.post('/', async (req, res) => {
             hitDieAmount: req.body.hitDieAmount ?? req.body.level ?? 1,
             safeHitDieAmount: req.body.safeHitDieAmount ?? req.body.level ?? 1,
             overrideHitPoints: req.body.overrideHitPoints ?? false,
+            skillProficiencies: req.body.skillProficiencies,
             /*equipment: req.body.equipment,
             spells: req.body.spells,*/
         });
