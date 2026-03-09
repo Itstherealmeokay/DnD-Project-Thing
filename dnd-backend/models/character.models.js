@@ -26,6 +26,7 @@ const characterSchema = new mongoose.Schema({
     overrideHitPoints: {type: Boolean, required: false, default: false},
 
     skillProficiencies: [{type: String}],
+    expertise: [{type: String}],
 
     //equipment: [equipmentSchema], 
     //spells: [spellSchema], 

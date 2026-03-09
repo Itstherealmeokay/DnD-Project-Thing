@@ -74,6 +74,7 @@ router.post('/', async (req, res) => {
             safeHitDieAmount: req.body.safeHitDieAmount ?? req.body.level ?? 1,
             overrideHitPoints: req.body.overrideHitPoints ?? false,
             skillProficiencies: req.body.skillProficiencies,
+            expertise: req.body.expertise,
             /*equipment: req.body.equipment,
             spells: req.body.spells,*/
         });
@@ -184,6 +185,12 @@ router.patch('/:id', async (req, res) => {
 
         if (req.body.safeHitDieAmount != undefined) {
             character.safeHitDieAmount = req.body.safeHitDieAmount;
+        }
+        if (req.body.skillProficiencies != undefined) {
+            character.skillProficiencies = req.body.skillProficiencies;
+        }
+        if (req.body.expertise != undefined) {
+            character.expertise = req.body.expertise;
         }
         /*if (req.body.equipment !=undefined) {
             character.equipment = req.body.equipment;
