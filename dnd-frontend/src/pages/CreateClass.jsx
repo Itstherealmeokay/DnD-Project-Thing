@@ -2,6 +2,28 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SubmitButton from '../components/SubmitButton';
+import MultiSelectDropdown from '../components/MultiSelectDropdown';
+
+const SKILL_OPTIONS = [
+  'Acrobatics',
+  'Animal Handling',
+  'Arcana',
+  'Athletics',
+  'Deception',
+  'History',
+  'Insight',
+  'Intimidation',
+  'Investigation',
+  'Medicine',
+  'Nature',
+  'Perception',
+  'Performance',
+  'Persuasion',
+  'Religion',
+  'Sleight of Hand',
+  'Stealth',
+  'Survival'
+];
 
 const CreateClass = () => {
   const navigate = useNavigate();
@@ -12,7 +34,7 @@ const CreateClass = () => {
     armorProficiencies: '',
     weaponProficiencies: '',
     savingThrows: '',
-    skills: '',
+    skills: [],
     classFeatures: ''
   });
 
@@ -40,13 +62,18 @@ const CreateClass = () => {
       return;
     }
 
+    if (formData.skills.length === 0) {
+      setMessage({ text: 'Select at least one skill proficiency.', type: 'error' });
+      return;
+    }
+
     const payload = {
       name: formData.name,
       hitDie: parsedHitDie,
       armorProficiencies: toArray(formData.armorProficiencies),
       weaponProficiencies: toArray(formData.weaponProficiencies),
       savingThrows: toArray(formData.savingThrows),
-      skills: toArray(formData.skills),
+      skills: formData.skills,
       classFeatures: toArray(formData.classFeatures)
     };
 
@@ -142,14 +169,17 @@ const CreateClass = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Skills *</label>
-              <input
-                name="skills"
-                value={formData.skills}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Comma-separated values"
+              <label className="block text-sm font-medium text-gray-700 mb-2">Skill Proficiencies *</label>
+              <MultiSelectDropdown
+                options={SKILL_OPTIONS}
+                selectedValues={formData.skills}
+                onChange={(values) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    skills: values
+                  }))
+                }
+                placeholder="Select skill proficiencies"
               />
             </div>
           </div>

@@ -132,7 +132,16 @@ router.patch('/:id', async (req, res) => {
             character.name = req.body.name;
         }
         if (req.body.class !=undefined) {
-            character.class = req.body.class;
+            const selectedClass = await Class.findById(req.body.class);
+            if (!selectedClass) {
+                return res.status(400).json({ message: 'Invalid class ID' });
+            }
+
+            character.class = selectedClass._id;
+
+            const currentSkills = character.skillProficiencies || [];
+            const classSkills = selectedClass.skillProficiencies || [];
+            character.skillProficiencies = [...currentSkills, ...classSkills];
         }
         if (req.body.level !=undefined) {
             character.level = req.body.level;
@@ -228,5 +237,6 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 export default router;

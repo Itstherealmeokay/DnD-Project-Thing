@@ -10,8 +10,6 @@ const CharacterDetails = () => {
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [skillProficiencies, setSkillProficiencies] = useState([]);
-  const [skillExpertise, setSkillExpertise] = useState([]);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -22,9 +20,7 @@ const CharacterDetails = () => {
         }
         const data = await response.json();
         setCharacter(data);
-        // Load skill proficiencies and expertise from database
-        setSkillProficiencies(data.skillProficiencies || []);
-        setSkillExpertise(data.expertise || []);
+        
       } catch (err) {
         setError(err.message);
       } finally {
@@ -130,69 +126,71 @@ const CharacterDetails = () => {
   };
 
   const handleToggleProficiency = async (skillId) => {
-    const newProficiencies = skillProficiencies.includes(skillId)
-      ? skillProficiencies.filter(id => id !== skillId)
-      : [...skillProficiencies, skillId];
-    
-    // If removing proficiency, also remove expertise
-    const newExpertise = skillProficiencies.includes(skillId)
-      ? skillExpertise.filter(id => id !== skillId)
-      : skillExpertise;
+  const currentProficiencies = character.skillProficiencies || [];
+  const currentExpertise = character.expertise || [];
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          skillProficiencies: newProficiencies,
-          expertise: newExpertise,
-        }),
-      });
+  const newProficiencies = currentProficiencies.includes(skillId)
+    ? currentProficiencies.filter(id => id !== skillId)
+    : [...currentProficiencies, skillId];
 
-      if (!response.ok) {
-        throw new Error('Failed to update character');
-      }
+  // If removing proficiency, also remove expertise
+  const newExpertise = currentProficiencies.includes(skillId)
+    ? currentExpertise.filter(id => id !== skillId)
+    : currentExpertise;
 
-      const updatedCharacter = await response.json();
-      setCharacter(updatedCharacter);
-      setSkillProficiencies(newProficiencies);
-      setSkillExpertise(newExpertise);
-    } catch (err) {
-      console.error('Error updating proficiency:', err);
-      alert('Failed to update skill proficiency');
+  try {
+    const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        skillProficiencies: newProficiencies,
+        expertise: newExpertise,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update character');
     }
-  };
+
+    const updatedCharacter = await response.json();
+    setCharacter(updatedCharacter);
+  } catch (err) {
+    console.error('Error updating proficiency:', err);
+    alert('Failed to update skill proficiency');
+  }
+};
 
   const handleToggleExpertise = async (skillId) => {
-    const newExpertise = skillExpertise.includes(skillId)
-      ? skillExpertise.filter(id => id !== skillId)
-      : [...skillExpertise, skillId];
+  const currentExpertise = character.expertise || [];
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          expertise: newExpertise,
-        }),
-      });
+  const newExpertise = currentExpertise.includes(skillId)
+    ? currentExpertise.filter(id => id !== skillId)
+    : [...currentExpertise, skillId];
 
-      if (!response.ok) {
-        throw new Error('Failed to update character');
-      }
+  try {
+    const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        expertise: newExpertise,
+      }),
+    });
 
-      const updatedCharacter = await response.json();
-      setCharacter(updatedCharacter);
-      setSkillExpertise(newExpertise);
-    } catch (err) {
-      console.error('Error updating expertise:', err);
-      alert('Failed to update skill expertise');
+    if (!response.ok) {
+      throw new Error('Failed to update character');
     }
-  };
+
+    const updatedCharacter = await response.json();
+    setCharacter(updatedCharacter);
+  } catch (err) {
+    console.error('Error updating expertise:', err);
+    alert('Failed to update skill expertise');
+  }
+};
 
   if (loading) {
     return (
@@ -252,6 +250,9 @@ const CharacterDetails = () => {
     typeof character.class === 'object' && character.class !== null
       ? character.class.name
       : character.class;
+
+  const skillProficiencies = character.skillProficiencies || [];
+  const skillExpertise = character.expertise || [];
 
   const classHitDie =
     typeof character.class === 'object' && character.class !== null
