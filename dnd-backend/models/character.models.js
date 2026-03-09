@@ -17,12 +17,17 @@ const characterSchema = new mongoose.Schema({
     charisma: {type: Number, required: true, min: 1, max: 30}, 
 
     proficiencyBonus: {type: Number, required: true}, 
+
     currentHitPoints: {type: Number, required: true},
     maxHitPoints: {type: Number, required: true},
     hitDie: {type: Number, required: false, default: 8},
     hitDieAmount: {type: Number, required: false, default: 1},
     safeHitDieAmount: {type: Number, required: false, default: 1},
     overrideHitPoints: {type: Boolean, required: false, default: false},
+
+    skillProficiencies: [{type: String}],
+    expertise: [{type: String}],
+
     //equipment: [equipmentSchema], 
     //spells: [spellSchema], 
 });

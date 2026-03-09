@@ -3,12 +3,15 @@ import { useParams } from 'react-router-dom';
 import InfoBox from '../components/InfoBox';
 import AbilityScoreBox from '../components/AbilityScoreBox';
 import VitalsBox from '../components/VitalsBox';
+import SkillSection from '../components/SkillSection';
 
 const CharacterDetails = () => {
   const { id } = useParams();
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [skillProficiencies, setSkillProficiencies] = useState([]);
+  const [skillExpertise, setSkillExpertise] = useState([]);
 
   useEffect(() => {
     const fetchCharacter = async () => {
@@ -19,6 +22,9 @@ const CharacterDetails = () => {
         }
         const data = await response.json();
         setCharacter(data);
+        // Load skill proficiencies and expertise from database
+        setSkillProficiencies(data.skillProficiencies || []);
+        setSkillExpertise(data.expertise || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -123,6 +129,71 @@ const CharacterDetails = () => {
     }
   };
 
+  const handleToggleProficiency = async (skillId) => {
+    const newProficiencies = skillProficiencies.includes(skillId)
+      ? skillProficiencies.filter(id => id !== skillId)
+      : [...skillProficiencies, skillId];
+    
+    // If removing proficiency, also remove expertise
+    const newExpertise = skillProficiencies.includes(skillId)
+      ? skillExpertise.filter(id => id !== skillId)
+      : skillExpertise;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          skillProficiencies: newProficiencies,
+          expertise: newExpertise,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+      setSkillProficiencies(newProficiencies);
+      setSkillExpertise(newExpertise);
+    } catch (err) {
+      console.error('Error updating proficiency:', err);
+      alert('Failed to update skill proficiency');
+    }
+  };
+
+  const handleToggleExpertise = async (skillId) => {
+    const newExpertise = skillExpertise.includes(skillId)
+      ? skillExpertise.filter(id => id !== skillId)
+      : [...skillExpertise, skillId];
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          expertise: newExpertise,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+      setSkillExpertise(newExpertise);
+    } catch (err) {
+      console.error('Error updating expertise:', err);
+      alert('Failed to update skill expertise');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -156,6 +227,27 @@ const CharacterDetails = () => {
     { name: 'Charisma', score: character.charisma },
   ];
 
+  const Skills = [
+    { id: 'acrobatics', name: 'Acrobatics', ability: 'Dexterity' },
+    { id: 'animalHandling', name: 'Animal Handling', ability: 'Wisdom' },
+    { id: 'arcana', name: 'Arcana', ability: 'Intelligence' },
+    { id: 'athletics', name: 'Athletics', ability: 'Strength' },
+    { id: 'deception', name: 'Deception', ability: 'Charisma' },
+    { id: 'history', name: 'History', ability: 'Intelligence' },
+    { id: 'insight', name: 'Insight', ability: 'Wisdom' },
+    { id: 'intimidation', name: 'Intimidation', ability: 'Charisma' },
+    { id: 'investigation', name: 'Investigation', ability: 'Intelligence' },
+    { id: 'medicine', name: 'Medicine', ability: 'Wisdom' },
+    { id: 'nature', name: 'Nature', ability: 'Intelligence' },
+    { id: 'perception', name: 'Perception', ability: 'Wisdom' },
+    { id: 'performance', name: 'Performance', ability: 'Charisma' },
+    { id: 'persuasion', name: 'Persuasion', ability: 'Charisma' },
+    { id: 'religion', name: 'Religion', ability: 'Intelligence' },
+    { id: 'sleightOfHand', name: 'Sleight of Hand', ability: 'Dexterity' },
+    { id: 'stealth', name: 'Stealth', ability: 'Dexterity' },
+    { id: 'survival', name: 'Survival', ability: 'Wisdom' },
+  ];
+
   const classDisplayName =
     typeof character.class === 'object' && character.class !== null
       ? character.class.name
@@ -169,6 +261,10 @@ const CharacterDetails = () => {
 
   const constitutionModifier = Math.floor((Number(character.constitution ?? 10) - 10) / 2);
   const dexterityModifier = Math.floor((Number(character.dexterity ?? 10) - 10) / 2);
+  
+  // proficency given by user input
+  const proficiencyBonus = Number(character.proficiencyBonus ?? 0);
+  const expertiseBonus = proficiencyBonus * 2;  
 
   // Use class hit die for HP calculation
   const hitDieBonus = Math.floor(((classHitDie / 2) + 1) * (level - 1));
@@ -199,12 +295,13 @@ const CharacterDetails = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* Ability Scores Section */}
-          <div className="bg-gray-50 rounded-lg p-6">
+          {/* Left Column: Ability Scores and Skills */}
+          <div className="bg-gray-200 rounded-lg p-6">
+            {/* Ability Scores Section */}
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Ability Scores
             </h2>
-            <div className="flex flex-row gap-4 flex-wrap">
+            <div className="flex flex-row gap-4 flex-wrap mb-8">
               {abilityScores.map((ability) => (
                 <AbilityScoreBox
                   key={ability.name}
@@ -213,6 +310,28 @@ const CharacterDetails = () => {
                   onScoreChange={handleScoreChange}
                 />
               ))}
+            </div>
+
+            {/* Skills Section */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Skills</h2>
+            <div className="space-y-2">
+              {['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'].map((ability) => {
+                const abilityKey = ability.toLowerCase();
+                return (
+                  <SkillSection
+                    key={ability}
+                    skills={Skills}
+                    ability={ability}
+                    proficiencyBonus={proficiencyBonus}
+                    expertiseBonus={expertiseBonus}
+                    skillProficiencies={skillProficiencies}
+                    skillExpertise={skillExpertise}
+                    onToggleProficiency={handleToggleProficiency}
+                    onToggleExpertise={handleToggleExpertise}
+                    abilityScore={character[abilityKey]}
+                  />
+                );
+              })}
             </div>
           </div>
 
