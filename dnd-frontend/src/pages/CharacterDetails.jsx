@@ -4,6 +4,7 @@ import InfoBox from '../components/InfoBox';
 import AbilityScoreBox from '../components/AbilityScoreBox';
 import VitalsBox from '../components/VitalsBox';
 import SkillSection from '../components/SkillSection';
+import SavingThrowSection from '../components/SavingThrowSection';
 
 const CharacterDetails = () => {
   const { id } = useParams();
@@ -194,6 +195,67 @@ const CharacterDetails = () => {
     }
   };
 
+  const handleToggleSavingThrow = async (abilityKey) => {
+    const currentProficiencies = character.savingThrowProficiencies || [];
+    const normalizedAbility = abilityKey.toLowerCase();
+    const newProficiencies = currentProficiencies.includes(normalizedAbility)
+      ? currentProficiencies.filter((name) => name !== normalizedAbility)
+      : [...currentProficiencies, normalizedAbility];
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          savingThrowProficiencies: newProficiencies,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      console.error('Error updating saving throw proficiency:', err);
+      alert('Failed to update saving throw proficiency');
+    }
+  };
+
+  const handleSavingThrowAdjustmentChange = async (abilityKey, adjustment) => {
+    const normalizedAbility = abilityKey.toLowerCase();
+    const currentAdjustments = character.savingThrowAdjustments || {};
+    const nextAdjustments = {
+      ...currentAdjustments,
+      [normalizedAbility]: adjustment,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          savingThrowAdjustments: nextAdjustments,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      console.error('Error updating saving throw adjustment:', err);
+      alert('Failed to update saving throw adjustment');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -225,6 +287,15 @@ const CharacterDetails = () => {
     { name: 'Intelligence', score: character.intelligence },
     { name: 'Wisdom', score: character.wisdom },
     { name: 'Charisma', score: character.charisma },
+  ];
+
+  const savingThrows = [
+    { name: 'Strength', key: 'strength' },
+    { name: 'Dexterity', key: 'dexterity' },
+    { name: 'Constitution', key: 'constitution' },
+    { name: 'Intelligence', key: 'intelligence' },
+    { name: 'Wisdom', key: 'wisdom' },
+    { name: 'Charisma', key: 'charisma' },
   ];
 
   const Skills = [
@@ -311,6 +382,24 @@ const CharacterDetails = () => {
                 />
               ))}
             </div>
+
+            {/* Saving Throws Section */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Saving Throws</h2>
+            <div className="space-y-2">
+              {savingThrows.map((save) => (
+                <SavingThrowSection
+                  key={save.key}
+                  ability={save.name}
+                  abilityScore={character[save.key]}
+                  proficiencyBonus={proficiencyBonus}
+                  isProficient={character.savingThrowProficiencies?.includes(save.key)}
+                  adjustment={character.savingThrowAdjustments?.[save.key] ?? 0}
+                  onToggleProficiency={handleToggleSavingThrow}
+                  onAdjustmentChange={handleSavingThrowAdjustmentChange}
+                />
+              ))}
+            </div>
+
 
             {/* Skills Section */}
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Skills</h2>

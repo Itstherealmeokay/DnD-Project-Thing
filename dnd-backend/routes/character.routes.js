@@ -73,6 +73,15 @@ router.post('/', async (req, res) => {
             hitDieAmount: req.body.hitDieAmount ?? req.body.level ?? 1,
             safeHitDieAmount: req.body.safeHitDieAmount ?? req.body.level ?? 1,
             overrideHitPoints: req.body.overrideHitPoints ?? false,
+            savingThrowProficiencies: req.body.savingThrowProficiencies ?? [],
+            savingThrowAdjustments: {
+                strength: Number(req.body?.savingThrowAdjustments?.strength ?? 0),
+                dexterity: Number(req.body?.savingThrowAdjustments?.dexterity ?? 0),
+                constitution: Number(req.body?.savingThrowAdjustments?.constitution ?? 0),
+                intelligence: Number(req.body?.savingThrowAdjustments?.intelligence ?? 0),
+                wisdom: Number(req.body?.savingThrowAdjustments?.wisdom ?? 0),
+                charisma: Number(req.body?.savingThrowAdjustments?.charisma ?? 0),
+            },
             skillProficiencies: req.body.skillProficiencies,
             expertise: req.body.expertise,
             /*equipment: req.body.equipment,
@@ -126,6 +135,21 @@ router.patch('/:id', async (req, res) => {
             if (character.safeHitDieAmount == undefined) {
                 character.safeHitDieAmount = character.level ?? 1;
             }
+        }
+
+        if (character.savingThrowProficiencies == undefined) {
+            character.savingThrowProficiencies = [];
+        }
+
+        if (character.savingThrowAdjustments == undefined) {
+            character.savingThrowAdjustments = {
+                strength: 0,
+                dexterity: 0,
+                constitution: 0,
+                intelligence: 0,
+                wisdom: 0,
+                charisma: 0,
+            };
         }
         
         if (req.body.name !=undefined) {
@@ -191,6 +215,19 @@ router.patch('/:id', async (req, res) => {
         }
         if (req.body.expertise != undefined) {
             character.expertise = req.body.expertise;
+        }
+        if (req.body.savingThrowProficiencies != undefined) {
+            character.savingThrowProficiencies = req.body.savingThrowProficiencies;
+        }
+        if (req.body.savingThrowAdjustments != undefined) {
+            character.savingThrowAdjustments = {
+                strength: Number(req.body.savingThrowAdjustments?.strength ?? character.savingThrowAdjustments?.strength ?? 0),
+                dexterity: Number(req.body.savingThrowAdjustments?.dexterity ?? character.savingThrowAdjustments?.dexterity ?? 0),
+                constitution: Number(req.body.savingThrowAdjustments?.constitution ?? character.savingThrowAdjustments?.constitution ?? 0),
+                intelligence: Number(req.body.savingThrowAdjustments?.intelligence ?? character.savingThrowAdjustments?.intelligence ?? 0),
+                wisdom: Number(req.body.savingThrowAdjustments?.wisdom ?? character.savingThrowAdjustments?.wisdom ?? 0),
+                charisma: Number(req.body.savingThrowAdjustments?.charisma ?? character.savingThrowAdjustments?.charisma ?? 0),
+            };
         }
         /*if (req.body.equipment !=undefined) {
             character.equipment = req.body.equipment;

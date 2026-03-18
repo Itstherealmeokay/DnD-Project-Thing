@@ -16,6 +16,17 @@ const characterSchema = new mongoose.Schema({
     wisdom: {type: Number, required: true, min: 1, max: 30}, 
     charisma: {type: Number, required: true, min: 1, max: 30}, 
 
+    savingThrows: [{type: String}],
+    savingThrowProficiencies: [{type: String, default: []}],
+    savingThrowAdjustments: {
+        strength: {type: Number, default: 0},
+        dexterity: {type: Number, default: 0},
+        constitution: {type: Number, default: 0},
+        intelligence: {type: Number, default: 0},
+        wisdom: {type: Number, default: 0},
+        charisma: {type: Number, default: 0},
+    },
+
     proficiencyBonus: {type: Number, required: true}, 
 
     currentHitPoints: {type: Number, required: true},
