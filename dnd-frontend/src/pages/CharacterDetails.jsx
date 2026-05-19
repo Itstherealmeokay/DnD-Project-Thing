@@ -195,6 +195,38 @@ const CharacterDetails = () => {
     }
   };
 
+  const handleLevelChange = async (newLevel) => {
+    const numLevel = Number(newLevel);
+    if (!Number.isFinite(numLevel) || numLevel < 1) {
+      alert('Level must be a positive number');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/characters/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          level: numLevel,
+          safeHitDieAmount: numLevel,
+          hitDieAmount: numLevel,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update character');
+      }
+
+      const updatedCharacter = await response.json();
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      console.error('Error updating level:', err);
+      alert('Failed to update level');
+    }
+  };
+
   const handleToggleSavingThrow = async (abilityKey) => {
     const currentProficiencies = character.savingThrowProficiencies || [];
     const normalizedAbility = abilityKey.toLowerCase();
@@ -333,8 +365,16 @@ const CharacterDetails = () => {
   const constitutionModifier = Math.floor((Number(character.constitution ?? 10) - 10) / 2);
   const dexterityModifier = Math.floor((Number(character.dexterity ?? 10) - 10) / 2);
   
-  // proficency given by user input
-  const proficiencyBonus = Number(character.proficiencyBonus ?? 0);
+  // Calculate proficiency bonus based on level
+  const calculateProficiencyBonus = (lvl) => {
+    if (lvl >= 17) return 6;
+    if (lvl >= 13) return 5;
+    if (lvl >= 9) return 4;
+    if (lvl >= 5) return 3;
+    return 2;
+  };
+  
+  const proficiencyBonus = calculateProficiencyBonus(level);
   const expertiseBonus = proficiencyBonus * 2;  
 
   // Use class hit die for HP calculation
@@ -359,7 +399,17 @@ const CharacterDetails = () => {
           </h1>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <InfoBox title="Class" value={classDisplayName} />
-            <InfoBox title="Level" value={character.level} />
+            <div className="bg-white border-2 border-gray-600 rounded-lg p-4 text-center flex flex-col justify-center items-center">
+              <label className="text-sm font-semibold text-gray-600 block mb-2">Level</label>
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={character.level}
+                onChange={(e) => handleLevelChange(e.target.value)}
+                className="w-16 text-center text-2xl font-bold text-gray-900 border border-gray-400 rounded px-2 py-1"
+              />
+            </div>
             <InfoBox title="Race" value={character.race} />
             <InfoBox title="Background" value={character.background} />
           </div>
